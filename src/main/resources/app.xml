@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       https://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       https://www.springframework.org/schema/context/spring-context.xsd">
+    <context:component-scan base-package="com.alevel"/>
+
+    <bean id="beanExample" class="com.alevel.beans.BeanExample" lazy-init="true"
+          destroy-method="finish"/>
+    <bean name="beanExampleTwo bet" class="com.alevel.beans.BeanExample" scope="prototype"
+          init-method="init"/>
+    <alias name="beanExample" alias="be"/>
+
+    <bean name="beanContainer" class="com.alevel.beans.BeanContainer" lazy-init="true">
+        <constructor-arg>
+            <list>
+                <ref bean="beanExample"/>
+                <ref bean="beanExampleTwo"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="calendar" class="java.util.Calendar" factory-method="getInstance"/>
+    <bean id="userBuilder" class="com.alevel.user.UserBuilder"/>
+    <bean id="user" factory-method="buildUser" factory-bean="userBuilder"/>
+
+    <bean name="jack" class="com.alevel.user.User">
+        <property name="name" value="Jack"/>
+        <property name="age" value="29"/>
+    </bean>
+
+    <bean name="userDao" class="com.alevel.dao.UserDao">
+        <constructor-arg>
+            <map>
+                <entry key="1" value-ref="jack"/>
+                <entry key="2" value-ref="user"/>
+            </map>
+        </constructor-arg>
+        <property name="contacts">
+            <props>
+                <prop key="John">John@mail.com</prop>
+            </props>
+        </property>
+    </bean>
+    <bean name="userDaoExtended" parent="userDao">
+        <property name="contacts">
+            <props merge="true">
+                <prop key="Jack">jack@mail.com</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean name="userService" class="com.alevel.user.UserServiceImpl">
+        <constructor-arg ref="userDaoExtended"/>
+    </bean>
+
+    <bean name="groupRepository" class="com.alevel.respository.GroupRepository"/>
+    <bean name="groupService" class="com.alevel.service.GroupService">
+        <constructor-arg ref="groupRepository"/>
+    </bean>
+</beans>
